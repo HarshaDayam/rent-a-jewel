@@ -1,0 +1,119 @@
+[
+  {
+    "id": "p1",
+    "name": "AD Stone Leaf Design Necklace Set",
+    "category": "Necklace",
+    "price": 699,
+    "oldPrice": 899,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2025-12-17at3.54.13PM.jpg?v=1765967074&width=900",
+    "desc": "Delicate, botanical-inspired leaf motifs intricately encrusted with premium American Diamonds, creating a graceful silhouette."
+  },
+  {
+    "id": "p2",
+    "name": "AD Stone Necklace Set",
+    "category": "Necklace",
+    "price": 599,
+    "oldPrice": 699,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2025-12-03at11.06.13AM.jpg?v=1765789887&width=900",
+    "desc": "A dazzling ensemble featuring a beautifully crafted necklace and matching earrings studded with sparkling AD stones."
+  },
+  {
+    "id": "p3",
+    "name": "AD Stone Bangles Set",
+    "category": "Bangles",
+    "price": 899,
+    "oldPrice": 999,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2025-12-17at3.31.25PM.jpg?v=1765966235&width=900",
+    "desc": "Premium AD Stone bangles encrusted with precision-cut American Diamonds that deliver a diamond-like fire and sparkle."
+  },
+  {
+    "id": "p4",
+    "name": "Matt Finish Kemp Stone Choker",
+    "category": "Choker",
+    "price": 1099,
+    "oldPrice": 1299,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2026-03-18at11.56.48AM.jpg?v=1773817895&width=900",
+    "desc": "A rich matte-finish choker set with vibrant ruby-toned Kemp stones, perfect for festive and bridal looks."
+  },
+  {
+    "id": "p5",
+    "name": "Antique Finish Temple Jhumka Earrings Set",
+    "category": "Earrings",
+    "price": 599,
+    "oldPrice": 699,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2026-04-16at2.04.03PM.jpg?v=1776333293&width=900",
+    "desc": "Trending temple-style jhumkas with an antique gold finish, bringing classic South Indian elegance to any outfit."
+  },
+  {
+    "id": "p6",
+    "name": "Kemp Stone and AD Stone Bangles",
+    "category": "Bangles",
+    "price": 1499,
+    "oldPrice": 1699,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2026-04-14at5.28.06PM.jpg?v=1776340484&width=900",
+    "desc": "A striking pairing of real-look Kemp stones and AD stones set in a traditional bangle silhouette."
+  },
+  {
+    "id": "p7",
+    "name": "Kalamkari Antique Finish Lakshmi Pendant Mid Haram Set",
+    "category": "Haram",
+    "price": 799,
+    "oldPrice": 999,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2026-04-14at3.30.59PM.jpg?v=1776161150&width=900",
+    "desc": "An antique-finish mid-length haram featuring a divine Lakshmi pendant with Kalamkari-inspired detailing."
+  },
+  {
+    "id": "p8",
+    "name": "Matt Finish AD Stone Double Jhumka Earrings",
+    "category": "Earrings",
+    "price": 699,
+    "oldPrice": 799,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2026-04-17at4.57.28PM_2.jpg?v=1776432247&width=900",
+    "desc": "Layered double-jhumka earrings in a soft matte gold finish, embellished with shimmering AD stones."
+  },
+  {
+    "id": "p9",
+    "name": "Lotus Necklace Set, Antique Finish",
+    "category": "Necklace",
+    "price": 599,
+    "oldPrice": 699,
+    "img": "https://cdn.shopify.com/s/files/1/0725/4687/7487/files/WhatsAppImage2026-04-26at9.45.22AM.jpg?v=1777178083&width=900",
+    "desc": "An antique-finish necklace set with a lotus motif, blending devotional symbolism with everyday elegance."
+  },
+  {
+    "id": "p10",
+    "name": "AD Stone GJ Polish Haram Set",
+    "category": "Haram",
+    "price": 1799,
+    "oldPrice": 1999,
+    "img": "https://sriyascollection.com/cdn/shop/files/49.jpg?v=1764845324&width=900",
+    "desc": "A rich gold-tone haram with dual-tone GJ polish and sparkling AD stones, ideal for grand festive occasions."
+  },
+  {
+    "id": "p11",
+    "name": "3D Antique Finish Temple Design Marriage Set",
+    "category": "Bridal",
+    "price": 6499,
+    "oldPrice": 7499,
+    "img": "https://sriyascollection.com/cdn/shop/files/WhatsApp_Image_2026-04-06_at_6.47.32_PM.jpg?v=1775481479&width=900",
+    "desc": "A grand bridal set with layered temple-inspired 3D detailing, designed to be the centerpiece of a wedding look."
+  },
+  {
+    "id": "p12",
+    "name": "Antique Design Lakshmi Haram Set",
+    "category": "Haram",
+    "price": 1299,
+    "oldPrice": 1499,
+    "img": "https://sriyascollection.com/cdn/shop/files/WhatsAppImage2025-12-24at4.03.46PM.jpg?v=1766572500&width=900",
+    "desc": "A stunning haram with intricate Lakshmi detailing in an antique finish, striking on any traditional outfit."
+  },
+  {
+    "id": "p13",
+    "name": "Silver Polish AD Stone Bangles",
+    "category": "Bangles",
+    "price": 999,
+    "oldPrice": 1099,
+    "img": "https://sriyascollection.com/cdn/shop/files/59.jpg?v=1764841504&width=900",
+    "desc": "Sleek silver-polish bangles set with premium American Diamond stones for a bright, contemporary shine."
+  }
+]
