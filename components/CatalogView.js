@@ -9,6 +9,59 @@ function formatRupee(n) {
   return RUPEE_SYMBOL + Number(n).toLocaleString("en-IN") + ".00";
 }
 
+function levenshteinDistance(a, b) {
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+function isWordMatchWithTypo(queryWord, targetText) {
+  const q = queryWord.toLowerCase().trim();
+  if (!q) return true;
+  
+  const targetWords = targetText.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // remove punctuation
+    .split(/\s+/)
+    .filter(Boolean);
+    
+  // Check exact substring match first (e.g. "neck" matches "necklace")
+  if (targetWords.some(w => w.includes(q))) {
+    return true;
+  }
+  
+  let threshold = 0;
+  if (q.length >= 6) {
+    threshold = 2;
+  } else if (q.length >= 4) {
+    threshold = 1;
+  }
+  
+  if (threshold === 0) return false;
+  
+  return targetWords.some(w => {
+    if (Math.abs(w.length - q.length) > threshold) return false;
+    return levenshteinDistance(q, w) <= threshold;
+  });
+}
+
 export default function CatalogView({ products = [] }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,6 +72,7 @@ export default function CatalogView({ products = [] }) {
   const [isZoomed, setIsZoomed] = useState(false);
   const [wishlist, setWishlist] = useState([]);
   const [isHovering, setIsHovering] = useState(false);
+  const [isTouchZooming, setIsTouchZooming] = useState(false);
   const [lensPos, setLensPos] = useState({ xPercent: 0, yPercent: 0 });
   const zoomFactor = 2.5;
 
@@ -98,6 +152,7 @@ export default function CatalogView({ products = [] }) {
     setActiveProduct(null);
     setIsZoomed(false);
     setIsHovering(false);
+    setIsTouchZooming(false);
   };
 
   const handleMouseEnter = () => {
@@ -127,6 +182,36 @@ export default function CatalogView({ products = [] }) {
     });
   };
 
+  const updateTouchPos = (e) => {
+    if (e.touches.length === 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touch = e.touches[0];
+    const px = (touch.clientX - rect.left) / rect.width;
+    const py = (touch.clientY - rect.top) / rect.height;
+    const lensSize = 1 / zoomFactor;
+    
+    const xPos = Math.max(0, Math.min(px - lensSize / 2, 1 - lensSize));
+    const yPos = Math.max(0, Math.min(py - lensSize / 2, 1 - lensSize));
+    
+    setLensPos({
+      xPercent: xPos * 100,
+      yPercent: yPos * 100
+    });
+  };
+
+  const handleTouchStart = (e) => {
+    setIsTouchZooming(true);
+    updateTouchPos(e);
+  };
+
+  const handleTouchMove = (e) => {
+    updateTouchPos(e);
+  };
+
+  const handleTouchEnd = () => {
+    setIsTouchZooming(false);
+  };
+
   // Close when clicking on the dialog backdrop
   const handleBackdropClick = (e) => {
     if (e.target === dialogRef.current) {
@@ -153,9 +238,11 @@ export default function CatalogView({ products = [] }) {
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = selectedCategory === 'All' || p.category === mapNavCategory(selectedCategory);
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          p.desc.toLowerCase().includes(searchQuery.toLowerCase());
+    const queryWords = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+    const searchableText = `${p.name} ${p.category} ${p.desc || ""}`;
+    const matchesSearch = queryWords.every(word => 
+      isWordMatchWithTypo(word, searchableText)
+    );
     return matchesCategory && matchesSearch;
   });
 
@@ -185,32 +272,14 @@ export default function CatalogView({ products = [] }) {
             ))}
           </ul>
           <div className="nav-icons">
-            {showSearchInput && (
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--gold)',
-                  background: 'var(--ivory)',
-                  color: 'var(--ink)',
-                  fontSize: '13px',
-                  outline: 'none',
-                  width: '140px',
-                  animation: 'fadeIn 0.2s ease'
-                }}
-              />
-            )}
-            <button 
+            <a 
+              href="/search"
               className="icon-btn" 
-              title="Search" 
-              onClick={() => setShowSearchInput(!showSearchInput)}
+              title="Search & Filters"
+              style={{ textDecoration: 'none' }}
             >
               &#128269;
-            </button>
+            </a>
             <button 
               className="icon-btn" 
               title="Wishlist"
@@ -415,43 +484,33 @@ export default function CatalogView({ products = [] }) {
         onClose={closeModal}
       >
         {activeProduct && (
-          <div className="modal-box">
+          <>
             <button className="modal-close" onClick={closeModal}>&#10005;</button>
-            <div 
-              className={`modal-img ${isZoomed ? 'zoomed' : ''}`} 
-              onClick={() => {
-                if (window.innerWidth <= 720) {
-                  setIsZoomed(!isZoomed);
-                }
-              }}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-              onMouseMove={handleMouseMove}
-            >
-              <JewelSVG 
-                category={activeProduct.category} 
-                productId={activeProduct.id} 
-                imageUrl={activeProduct.img} 
-                altText={activeProduct.name} 
-              />
-              {isHovering && (
-                <div 
-                  className="zoom-lens"
+            <div className="modal-box">
+              <div 
+                className={`modal-img ${isZoomed ? 'zoomed' : ''}`} 
+                onClick={() => {
+                  if (window.innerWidth <= 720) {
+                    setIsZoomed(!isZoomed);
+                  }
+                }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onMouseMove={handleMouseMove}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                style={{ touchAction: 'none' }}
+              >
+                <div
                   style={{
-                    left: `${lensPos.xPercent}%`,
-                    top: `${lensPos.yPercent}%`,
-                    width: `${(1 / zoomFactor) * 100}%`,
-                    height: `${(1 / zoomFactor) * 100}%`
-                  }}
-                />
-              )}
-            </div>
-            {isHovering && (
-              <div className="zoom-window">
-                <div 
-                  className="zoom-img-container"
-                  style={{
-                    transform: `scale(${zoomFactor}) translate(-${lensPos.xPercent}%, -${lensPos.yPercent}%)`
+                    width: '100%',
+                    height: '100%',
+                    transform: isTouchZooming 
+                      ? `scale(${zoomFactor}) translate(-${lensPos.xPercent}%, -${lensPos.yPercent}%)` 
+                      : 'none',
+                    transformOrigin: '0 0',
+                    transition: isTouchZooming ? 'none' : 'transform 0.15s ease-out'
                   }}
                 >
                   <JewelSVG 
@@ -461,22 +520,50 @@ export default function CatalogView({ products = [] }) {
                     altText={activeProduct.name} 
                   />
                 </div>
-              </div>
-            )}
-            <div className="modal-info">
-              <div className="eyebrow">{activeProduct.category}</div>
-              <h3>{activeProduct.name}</h3>
-              <div className="price-row">
-                <span className="price">{formatRupee(activeProduct.price)}</span>
-                {activeProduct.oldPrice > activeProduct.price && (
-                  <span className="price-strike">{formatRupee(activeProduct.oldPrice)}</span>
+                {isHovering && (
+                  <div 
+                    className="zoom-lens"
+                    style={{
+                      left: `${lensPos.xPercent}%`,
+                      top: `${lensPos.yPercent}%`,
+                      width: `${(1 / zoomFactor) * 100}%`,
+                      height: `${(1 / zoomFactor) * 100}%`
+                    }}
+                  />
                 )}
               </div>
-              <p className="desc">{activeProduct.desc || "Exquisitely detailed jewelry piece, handcrafted for special celebrations and traditional occasions."}</p>
-              <div className="zoom-note desktop-note">Hover over image to zoom</div>
-              <div className="zoom-note mobile-note">Tap image to zoom</div>
+              {isHovering && (
+                <div className="zoom-window">
+                  <div 
+                    className="zoom-img-container"
+                    style={{
+                      transform: `scale(${zoomFactor}) translate(-${lensPos.xPercent}%, -${lensPos.yPercent}%)`
+                    }}
+                  >
+                    <JewelSVG 
+                      category={activeProduct.category} 
+                      productId={activeProduct.id} 
+                      imageUrl={activeProduct.img} 
+                      altText={activeProduct.name} 
+                    />
+                  </div>
+                </div>
+              )}
+              <div className="modal-info">
+                <div className="eyebrow">{activeProduct.category}</div>
+                <h3>{activeProduct.name}</h3>
+                <div className="price-row">
+                  <span className="price">{formatRupee(activeProduct.price)}</span>
+                  {activeProduct.oldPrice > activeProduct.price && (
+                    <span className="price-strike">{formatRupee(activeProduct.oldPrice)}</span>
+                  )}
+                </div>
+                <p className="desc">{activeProduct.desc || "Exquisitely detailed jewelry piece, handcrafted for special celebrations and traditional occasions."}</p>
+                <div className="zoom-note desktop-note">Hover over image to zoom</div>
+                <div className="zoom-note mobile-note">Tap image to zoom</div>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </dialog>
     </>
