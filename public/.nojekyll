@@ -1,0 +1,1 @@
+# Disable Jekyll build for GitHub Pages to allow folders starting with an underscore (like _next)
