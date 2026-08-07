@@ -8,6 +8,7 @@
     --ink: #2B1810;
     --muted: #8a7566;
     --card: #FFFDF9;
+    --green: #4caf50;
 }
 
 * {
@@ -635,6 +636,21 @@ dialog.modal-dialog::backdrop {
     padding-top: 10px;
 }
 
+.zoom-note.desktop-note {
+    display: block;
+}
+.zoom-note.mobile-note {
+    display: none;
+}
+@media (max-width: 720px) {
+    .zoom-note.desktop-note {
+        display: none !important;
+    }
+    .zoom-note.mobile-note {
+        display: block !important;
+    }
+}
+
 @media (max-width:720px) {
     .modal-box {
         grid-template-columns: 1fr;
@@ -652,3 +668,52 @@ dialog.modal-dialog::backdrop {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+/* ---------- zoom magnifier ---------- */
+.zoom-lens {
+    position: absolute;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.zoom-window {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 46.5%; /* matches the 1fr column width */
+    height: 100%;
+    background: var(--ivory);
+    border-left: 1px solid rgba(122, 75, 31, .15);
+    overflow: hidden;
+    z-index: 15;
+    pointer-events: none;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.2s ease;
+}
+
+.zoom-img-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 0;
+    display: block;
+}
+
+.zoom-img-container img,
+.zoom-img-container svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 720px) {
+    .zoom-lens,
+    .zoom-window {
+        display: none !important;
+    }
+}
+

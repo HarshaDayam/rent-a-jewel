@@ -18,6 +18,9 @@ export default function CatalogView({ products = [] }) {
   const [activeProduct, setActiveProduct] = useState(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [wishlist, setWishlist] = useState([]);
+  const [isHovering, setIsHovering] = useState(false);
+  const [lensPos, setLensPos] = useState({ xPercent: 0, yPercent: 0 });
+  const zoomFactor = 2.5;
 
   const dialogRef = useRef(null);
   const recentCarouselRef = useRef(null);
@@ -94,6 +97,34 @@ export default function CatalogView({ products = [] }) {
     }
     setActiveProduct(null);
     setIsZoomed(false);
+    setIsHovering(false);
+  };
+
+  const handleMouseEnter = () => {
+    if (window.innerWidth > 720) {
+      setIsHovering(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (window.innerWidth <= 720) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    const lensSize = 1 / zoomFactor;
+    
+    // Center the lens on cursor, and constrain it between 0 and 1 - lensSize
+    const xPos = Math.max(0, Math.min(px - lensSize / 2, 1 - lensSize));
+    const yPos = Math.max(0, Math.min(py - lensSize / 2, 1 - lensSize));
+    
+    setLensPos({
+      xPercent: xPos * 100,
+      yPercent: yPos * 100
+    });
   };
 
   // Close when clicking on the dialog backdrop
@@ -134,8 +165,8 @@ export default function CatalogView({ products = [] }) {
       <header className="site">
         <div className="nav-wrap">
           <a href="#" className="brand" onClick={() => setSelectedCategory('All')}>
-            <span className="name">Rent A Jewel</span>
-            <span className="sub">by Vidhya V</span>
+            <span className="name" style={{ color: 'var(--gold)' }}>RENT - A - JEWEL</span>
+            <span className="sub" style={{ color: 'var(--green)' }}>BY VIDHYA</span>
           </a>
           <ul className="nav-links">
             {categoriesList.slice(1).map(cat => (
@@ -206,10 +237,12 @@ export default function CatalogView({ products = [] }) {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="hero">
-        <div className="hero-eyebrow">Handcrafted &middot; AD Stone &amp; Temple Finish</div>
-        <h1>Rent A Jewel <span style={{ fontSize: '0.42em', display: 'block', letterSpacing: '2px', marginTop: '8px' }}>by Vidhya V</span></h1>
+        <div className="hero-eyebrow">CLASSICAL DANCE - BRIDAL - PARTYWEAR JEWELRY</div>
+        <h1>
+          <span style={{ color: 'var(--gold)' }}>RENT - A - JEWEL</span>
+          <span style={{ fontSize: '0.42em', display: 'block', letterSpacing: '2px', marginTop: '8px', color: 'var(--green)' }}>BY VIDHYA</span>
+        </h1>
         <p className="tag">Where tradition is set in every stone</p>
         <div className="ornament">
           <span className="line"></span>
@@ -368,10 +401,9 @@ export default function CatalogView({ products = [] }) {
         </div>
       </section>
 
-      {/* Footer */}
       <footer>
-        <div className="brand-foot">Rent A Jewel by Vidhya V</div>
-        <p>No.160, Avvai Nagar, Chennai &middot; sample catalog for demonstration</p>
+        <div className="brand-foot">RENT - A - JEWEL by VIDHYA</div>
+        <p>sample catalog for demonstration</p>
         <small>Product data &amp; images dynamically loaded from catalog sheet. Not an active store.</small>
       </footer>
 
@@ -385,14 +417,52 @@ export default function CatalogView({ products = [] }) {
         {activeProduct && (
           <div className="modal-box">
             <button className="modal-close" onClick={closeModal}>&#10005;</button>
-            <div className={`modal-img ${isZoomed ? 'zoomed' : ''}`} onClick={() => setIsZoomed(!isZoomed)}>
+            <div 
+              className={`modal-img ${isZoomed ? 'zoomed' : ''}`} 
+              onClick={() => {
+                if (window.innerWidth <= 720) {
+                  setIsZoomed(!isZoomed);
+                }
+              }}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onMouseMove={handleMouseMove}
+            >
               <JewelSVG 
                 category={activeProduct.category} 
                 productId={activeProduct.id} 
                 imageUrl={activeProduct.img} 
                 altText={activeProduct.name} 
               />
+              {isHovering && (
+                <div 
+                  className="zoom-lens"
+                  style={{
+                    left: `${lensPos.xPercent}%`,
+                    top: `${lensPos.yPercent}%`,
+                    width: `${(1 / zoomFactor) * 100}%`,
+                    height: `${(1 / zoomFactor) * 100}%`
+                  }}
+                />
+              )}
             </div>
+            {isHovering && (
+              <div className="zoom-window">
+                <div 
+                  className="zoom-img-container"
+                  style={{
+                    transform: `scale(${zoomFactor}) translate(-${lensPos.xPercent}%, -${lensPos.yPercent}%)`
+                  }}
+                >
+                  <JewelSVG 
+                    category={activeProduct.category} 
+                    productId={activeProduct.id} 
+                    imageUrl={activeProduct.img} 
+                    altText={activeProduct.name} 
+                  />
+                </div>
+              </div>
+            )}
             <div className="modal-info">
               <div className="eyebrow">{activeProduct.category}</div>
               <h3>{activeProduct.name}</h3>
@@ -403,7 +473,8 @@ export default function CatalogView({ products = [] }) {
                 )}
               </div>
               <p className="desc">{activeProduct.desc || "Exquisitely detailed jewelry piece, handcrafted for special celebrations and traditional occasions."}</p>
-              <div className="zoom-note">Click image to zoom in &middot; click again to zoom out</div>
+              <div className="zoom-note desktop-note">Hover over image to zoom</div>
+              <div className="zoom-note mobile-note">Tap image to zoom</div>
             </div>
           </div>
         )}
