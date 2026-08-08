@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import Link from 'next/link';
 import JewelSVG from './JewelSVG';
+import SearchWidget from './SearchWidget';
 
 const RUPEE_SYMBOL = "Rs. ";
 
@@ -62,9 +64,13 @@ function isWordMatchWithTypo(queryWord, targetText) {
   });
 }
 
+import { useSearchParams } from 'next/navigation';
+
 export default function SearchView({ products = [] }) {
+  const searchParams = useSearchParams();
+  
   // Search and Filter States
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(5000);
@@ -288,37 +294,32 @@ export default function SearchView({ products = [] }) {
       {/* Header */}
       <header className="site">
         <div className="nav-wrap">
-          <a href="/" className="brand">
+          <Link href="/" className="brand">
             <span className="name" style={{ color: 'var(--gold)' }}>RENT - A - JEWEL</span>
             <span className="sub" style={{ color: 'var(--green)' }}>BY VIDHYA</span>
-          </a>
+          </Link>
           <ul className="nav-links">
             <li>
-              <a href="/" style={{ color: 'var(--ivory)', fontSize: '13px', textDecoration: 'none', letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.8 }}>
+              <Link href="/" style={{ color: 'var(--ivory)', fontSize: '13px', textDecoration: 'none', letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.8 }}>
                 Home Catalog
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/search" style={{ color: 'var(--gold-light)', fontSize: '13px', textDecoration: 'none', letterSpacing: '1.5px', textTransform: 'uppercase', borderBottom: '1px solid var(--gold)', paddingBottom: '4px' }}>
+              <Link href="/search" style={{ color: 'var(--gold-light)', fontSize: '13px', textDecoration: 'none', letterSpacing: '1.5px', textTransform: 'uppercase', borderBottom: '1px solid var(--gold)', paddingBottom: '4px' }}>
                 Search &amp; Filters
-              </a>
+              </Link>
             </li>
           </ul>
           <div className="nav-icons">
-            <button 
+            <SearchWidget products={products} />
+            <Link 
+              href="/wishlist"
               className="icon-btn" 
-              title="Wishlist"
-              onClick={() => {
-                const wishlistProducts = products.filter(p => wishlist.includes(p.id));
-                if (wishlistProducts.length === 0) {
-                  alert("Your wishlist is empty. Tap the heart icon on items to add them!");
-                } else {
-                  alert(`You have ${wishlistProducts.length} items wishlisted! Use filters or search to view them.`);
-                }
-              }}
+              title="My Wishlist"
+              style={{ textDecoration: 'none' }}
             >
               {wishlist.length > 0 ? '❤️' : '♡'}
-            </button>
+            </Link>
           </div>
         </div>
       </header>
