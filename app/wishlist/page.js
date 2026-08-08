@@ -1,6 +1,6 @@
 import { parseProductsFromCSV } from "../../lib/csvParser";
 import { mockProducts } from "../../data/mockProducts";
-import SearchView from "../../components/SearchView";
+import WishlistView from "../../components/WishlistView";
 
 // Next.js config to ensure dynamically fetched data is server-rendered but cached with revalidation
 export const revalidate = 3600; // Revalidate cache every hour
@@ -8,7 +8,7 @@ export const revalidate = 3600; // Revalidate cache every hour
 async function getProducts() {
   const sheetId = process.env.GOOGLE_SHEET_ID;
   if (!sheetId) {
-    console.log("No GOOGLE_SHEET_ID set in environment. Using fallback mock products on search page.");
+    console.log("No GOOGLE_SHEET_ID set in environment. Using fallback mock products on wishlist page.");
     return mockProducts;
   }
 
@@ -19,7 +19,7 @@ async function getProducts() {
     });
     
     if (!res.ok) {
-      throw new Error(`Failed to fetch sheet data on search page, HTTP status: ${res.status}`);
+      throw new Error(`Failed to fetch sheet data on wishlist page, HTTP status: ${res.status}`);
     }
     
     const csvText = await res.text();
@@ -31,18 +31,12 @@ async function getProducts() {
     
     return mockProducts;
   } catch (err) {
-    console.error("Error fetching Google Sheet catalog for search page, falling back to mock database:", err);
+    console.error("Error fetching Google Sheet catalog for wishlist page, falling back to mock database:", err);
     return mockProducts;
   }
 }
 
-import { Suspense } from 'react';
-
-export default async function SearchPage() {
+export default async function WishlistPage() {
   const products = await getProducts();
-  return (
-    <Suspense fallback={<div>Loading search...</div>}>
-      <SearchView products={products} />
-    </Suspense>
-  );
+  return <WishlistView products={products} />;
 }

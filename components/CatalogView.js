@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import JewelSVG from './JewelSVG';
+import SearchWidget from './SearchWidget';
 
 const RUPEE_SYMBOL = "Rs. ";
 
@@ -251,10 +253,10 @@ export default function CatalogView({ products = [] }) {
       {/* Site Header */}
       <header className="site">
         <div className="nav-wrap">
-          <a href="#" className="brand" onClick={() => setSelectedCategory('All')}>
+          <Link href="/" className="brand" onClick={() => setSelectedCategory('All')}>
             <span className="name" style={{ color: 'var(--gold)' }}>RENT - A - JEWEL</span>
             <span className="sub" style={{ color: 'var(--green)' }}>BY VIDHYA</span>
-          </a>
+          </Link>
           <ul className="nav-links">
             {categoriesList.slice(1).map(cat => (
               <li key={cat}>
@@ -272,36 +274,15 @@ export default function CatalogView({ products = [] }) {
             ))}
           </ul>
           <div className="nav-icons">
-            <a 
-              href="/search"
+            <SearchWidget products={products} />
+            <Link 
+              href="/wishlist"
               className="icon-btn" 
-              title="Search & Filters"
+              title="My Wishlist"
               style={{ textDecoration: 'none' }}
             >
-              &#128269;
-            </a>
-            <button 
-              className="icon-btn" 
-              title="Wishlist"
-              onClick={() => {
-                // Show wishlisted items by toggling search filter or simple alert
-                const wishlistProducts = products.filter(p => wishlist.includes(p.id));
-                if (wishlistProducts.length === 0) {
-                  alert("Your wishlist is empty. Tap the heart icon on items to add them!");
-                } else {
-                  setSelectedCategory('All');
-                  setSearchQuery('');
-                  // Simple hack: filter products dynamically to show wishlist
-                  alert(`Showing your wishlist containing ${wishlistProducts.length} items.`);
-                  // Set search query to match IDs or just set filter logic.
-                  // For a cleaner UX, we can just filter to show wishlist
-                  // Let's filter directly by query if the user wants. Or we can just let it show:
-                  setSearchQuery("wishlist_active");
-                }
-              }}
-            >
               {wishlist.length > 0 ? '❤️' : '♡'}
-            </button>
+            </Link>
           </div>
         </div>
       </header>
